@@ -1,0 +1,112 @@
+// question：1003. Emergency (25) [Dijkstra算法]
+// As an emergency rescue team leader of a city, you are given a special map of your country. The map shows several scattered cities connected by some roads. Amount of rescue teams in each city and the length of each road between any pair of cities are marked on the map. When there is an emergency call to you from some other city, your job is to lead your men to the place as quickly as possible, and at the mean time, call up as many hands on the way as possible.
+// Input 
+// Each input file contains one test case. For each test case, the first line contains 4 positive integers: N (<= 500) – the number of cities (and the cities are numbered from 0 to N-1), M – the number of roads, C1 and C2 – the cities that you are currently in and that you must save, respectively. The next line contains N integers, where the i-th integer is the number of rescue teams in the i-th city. Then M lines follow, each describes a road with three integers c1, c2 and L, which are the pair of cities connected by a road and the length of that road, respectively. It is guaranteed that there exists at least one path from C1 to C2
+// Output
+// For each test case, print in one line two numbers: the number of diferent shortest paths between C1 and C2, and the maximum amount of rescue teams you can possibly gather. All the numbers in a line must be separated by exactly one space, and there is no extra space allowed at the end of a line
+// SAMPLE INPUT
+// 5 6 0 2
+// 1 2 1 5 3
+// 0 1 1
+// 0 2 2
+// 0 3 1
+// 1 2 1
+// 2 4 1
+// 3 4 1
+// Sample Output
+// 2 4
+// 题⽬⼤意：n个城市m条路，每个城市有救援⼩组，所有的边的边权已知。给定起点和终点，求从起点
+// 到终点的最短路径条数以及最短路径上的救援⼩组数⽬之和。如果有多条就输出点权（城市救援⼩组
+// 数⽬）最⼤的那个～
+
+
+#include<iostream>
+#include<algorithm>
+using namespace std;
+int n,m,c1,c2;
+// n 表示n个城市，m 表示m个权重道路，c1 表示起点， c2 表示终点
+int e[510][510],weight[510],dis[510],num[510],w[510];
+// e表示路径的起点终点（所以颠倒后权值一样），
+// weight表示每个城市的兵力
+// w表示兵力之和
+// num表示从出发点到i点的最短路径的条数
+// dis表示出发点到i的最短路径长度（初始化都是无限）
+bool visit[510];
+// c的inf是需要自己设置的
+const int inf = 99999999;
+
+
+int main(){
+	printf("input city number,road number,distnation,start place:\n");
+	scanf("%d%d%d%d",&n,&m,&c1,&c2);
+	for (int i = 0; i < n; i++){
+		printf("input military force for each city: \n");
+		scanf("%d", &weight[i]);
+	}
+	fill(e[0],e[0]+510*510,inf);//第零个到510*510个全部填充为inf
+	fill(dis,dis+510,inf);
+	int a,b,c;
+	for (int i = 0; i < m; i++){
+		printf("input value of a,b,c in e[a][b]=c:\n");
+		scanf("%d%d%d",&a,&b,&c);
+		e[a][b] = e[b][a] = c ;
+	}
+	// 记录 自己到自己路程为0
+	dis[c1] = 0 ;
+	// 记录 起点到自己最后有的兵力
+	w[c1] = weight[c1];
+	// 记录 自己到自己只有一条路
+	num[c1] = 1 ;
+	printf("::::::::now，let's begin algorithm:::::::::\n");
+	// 最多每个城都走一遍，所以循环n此
+	for (int i = 0; i < n; i++){
+		int u=-1,minn = inf;
+		for (int j = 0; j < n; ++j){
+			// 遍历访问每座城池，查找没走过（visit=false）
+			// 并且出发点到这座城市的已知举例不为无限
+			// 以此获得新的点 作为下一站，更新站的位置u
+			// 和最小值minn(已经行走的举例)(用于确保走的距离当前最短)
+			if (visit[j] == false && dis[j] < minn){
+				u = j;
+				minn = dis[j];
+				printf("\n--------renew current city as %d,minn as %d--------\n",u,minn);
+			}
+		}
+		// 如果没有下一步，那就说明走完了，跳出循环
+		if (u == -1) break;
+		// 否则将刚刚为起点的给改成true，表示走过了这座城
+		visit[u] = true;
+		for (int v = 0; v < n; ++v){
+			// 没标记走这坐城，且有通往下一站的路
+			if (visit[v] ==false && e[u][v] != inf){
+				// 如果已经走的距离 + 路径 < 已知的起点直接到达的距离
+				if (dis[u] + e[u][v] < dis[v]){
+					// 更新起点到这一点的最短距离
+					dis[v] = dis[u] + e[u][v];
+					// 更新最短路径需要的条数
+					num[v] = num[u];
+					// 更新最短距离到这里能拥有的军队数量
+					w[v] = w[u] + weight[v];
+					printf("info renew:from city '%d' to city '%d'\n",u,v);
+					printf("dis[%d](lowest distance)=%d, num[%d](edge number)=%d, w[%d](military)=%d\n",v,dis[v],v,num[v],v,w[v]);
+				}// 如果最短距离一样
+				else if(dis[u] + e[u][v] == dis[v]){
+					// 更新到此需要的最短距离的条数为 
+					num[v] = num[v] + num[u];
+					// 距离一样且兵力更多，更新兵力
+					if (w[u] + weight[v] > w[v]){
+						w[v] = w[u] + weight[v];
+					}
+					printf("info renew:from city '%d' to city '%d'\n",u,v);
+					printf("dis[%d](lowest distance)=%d, num[%d](edge number)=%d, w[%d](military)=%d\n",v,dis[v],v,num[v],v,w[v]);
+				}
+			}
+		}
+	}
+	
+	printf("\n::::the answer is:go %d road totally and get %d military force.\n",num[c2],w[c2]);
+	printf("input any word to exist:\n");
+	int zz;
+	scanf("%d",&zz);
+	return 0;
+}
