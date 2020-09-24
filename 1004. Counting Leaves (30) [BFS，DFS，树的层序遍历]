@@ -1,0 +1,77 @@
+// 1004. Counting Leaves (30) [BFS，DFS，树的层序遍历]
+// A family hierarchy is usually presented by a pedigree tree. Your job is to count those family members who
+// have no child.
+// Input
+// Each input file contains one test case. Each case starts with a line containing 0 < N < 100, the number of
+// nodes in a tree, and M (< N), the number of non-leaf nodes. Then M lines follow, each in the format:
+// ID K ID[1] ID[2] … ID[K]
+// where ID is a two-digit number representing a given non-leaf node, K is the number of its children,
+// followed by a sequence of two-digit ID’s of its children. For the sake of simplicity, let us fix the root ID to
+// be 01.
+// Output
+// For each test case, you are supposed to count those family members who have no child for every
+// seniority level starting from the root. The numbers must be printed in a line, separated by a space, and
+// there must be no extra space at the end of each line.
+// The sample case represents a tree with only 2 nodes, where 01 is the root and 02 is its only child. Hence
+// on the root 01 level, there is 0 leaf node; and on the next level, there is 1 leaf node. Then we should
+// output “0 1” in a line.
+// Sample Input
+// 2 1
+// 01 1 02
+// Sample Output
+// 0 1
+// 题⽬⼤意：给出⼀棵树，问每⼀层各有多少个叶⼦结点～
+// 分析：可以⽤dfs也可以⽤bfs～如果⽤dfs，⽤⼆维数组保存每⼀个有孩⼦结点的结点以及他们的孩⼦
+// 结点，从根结点开始遍历，直到遇到叶⼦结点，就将当前层数depth的book[depth]++；标记第depth层
+// 拥有的叶⼦结点数，最后输出～
+
+
+#include<iostream>
+#include<algorithm>
+#include<vector>
+using namespace std;
+//vector数组保存树，v数组位置标示节点号，
+//子节点push_pack进v以表示,v[][i]以获取i个节点，v[].size以获取节点数
+vector<int> v[100];
+//book存储不同层数的叶子节点，maxdepth存储层数
+int book[100],maxdepth=-1;
+void dfs(int current_node_numb, int depth);
+
+int main()
+{
+	//录入info
+	int nude_number,father_number,current_father_node,child_numb,child_nude;
+	scanf("%d %d",&nude_number,&father_number);
+	for (int i = 0; i < father_number; ++i)
+	{
+		scanf("%d %d",&current_father_node,&child_numb);
+		for (int j = 0; j < child_numb ; ++j)
+		{
+			scanf("%d",&child_nude);
+			v[current_father_node].push_back(child_nude);
+		}
+	}
+	dfs(1,0);
+	for (int i = 0; i <= maxdepth; ++i)
+	{
+		printf("in depth %d,their is %d leaves;\n",i,book[i]);
+	}
+	int zz;
+	scanf("%d",&zz);
+	return 0;
+}
+
+void dfs(int current_node_numb, int depth){
+	//size为0，叶子节点，本层叶子节点+1，看是否深度最大，是更新，否则返回
+	if (v[current_node_numb].size() == 0){
+		book[depth]++;
+		maxdepth = max(maxdepth,depth);
+		return;
+	}else{
+		for (int i = 0; i < v[current_node_numb].size() ; ++i)
+		{
+			dfs(v[current_node_numb][i],depth+1);
+		}
+	}
+}
+
