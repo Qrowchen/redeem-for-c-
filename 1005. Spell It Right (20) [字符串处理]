@@ -1,0 +1,38 @@
+// Given a non-negative integer N, your task is to compute the sum of all the digits of N, and output every
+// digit of the sum in English.
+// Input Specification:
+// Each input file contains one test case. Each case occupies one line which contains an N (<= 10100).
+// Output Specification:
+// For each test case, output in one line the digits of the sum in English words. There must be one space
+// between two consecutive words, but no extra space at the end of a line.
+// Sample Input:
+// 12345
+// Sample Output:
+// one five
+// 题⽬⼤意：给⼀个⾮负正数N，计算N的每⼀位相加的和，然后输出和的每⼀位的英⽂读⾳～
+// 分析：1、求出每⼀位相加的和sum
+// 2、将sum转换为string s 3、将string s的每⼀位输出对应的英⽂读⾳～
+
+#include<iostream>
+using namespace std;
+
+int main(){
+	string a;
+	cin >> a;
+	int sum = 0;
+	for (int i = 0; i < a.length(); ++i){
+		// 直接字符加减就可以得到数字结果，和计数器加减即可，不用过多转换
+		sum += (a[i]-'0');
+	}
+	string s = to_string(sum);
+	string arr[10] = {"zero","one","two","three","four","five",
+	"six","seven","eight","nine"};
+	// 妙啊，arr【减法得到大小】
+	// 用string也可以得到length确定输出几次
+	for (int i = 0; i < s.length(); ++i){
+		cout << " "<<arr[s[i]-'0'];
+	}
+	int suspend;
+	scanf("%d",&suspend);
+	return 0;
+}
