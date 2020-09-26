@@ -1,0 +1,69 @@
+// This time, you are supposed to find A*B where A and B are two polynomials.
+// Input Specification:
+// Each input file contains one test case. Each case occupies 2 lines, and each line contains the information
+// of a polynomial: K N1 aN1 N2 aN2 … NK aNK, where K is the number of nonzero terms in the polynomial,
+// Ni and aNi (i=1, 2, …, K) are the exponents and coeficients, respectively. It is given that 1 <= K <= 10, 0 <=
+// NK < … < N2 < N1 <=1000.
+// Output Specification:
+// For each test case you should output the product of A and B in one line, with the same format as the
+// input. Notice that there must be NO extra space at the end of each line. Please be accurate up to 1
+// decimal place.
+// Sample Input
+// 2 1 2.4 0 3.2
+// 2 2 1.5 1 0.5
+// Sample Output
+// 3 3 3.6 2 6.0 1 1.6
+
+// 题⽬⼤意：给出两个多项式A和B，求A*B的结果～
+// 分析：简单模拟～
+// double类型的arr数组保存第⼀组数据，ans数组保存结果。当输⼊第⼆组数据的时候，⼀边进⾏运算
+// ⼀边保存结果。最后按照指数递减的顺序输出所有不为0的项～
+// 注意：因为相乘后指数可能最⼤为2000，所以ans数组最⼤要开到2001
+
+#include<iostream>
+using namespace std;
+
+int main(int argc, char const *argv[])
+{
+	int n1, n2, a, cnt = 0;
+	float b,arr[1001] = {0.0}, ans[2001] = {0.0};
+	printf("input polynomial 1 number here\n");	
+	scanf("%d",&n1);
+	printf("n1 equal to %d,input polynomial 1 here\n",n1);
+	for (int i = 0; i < n1; i++)
+	{
+		printf("input polynomial 1 herinput polynomial 1 here\n i=%d now:\n",i);
+		scanf("%d %f", &a, &b);
+		printf("index=%d, value=%f, i=%d\n",a,b,i);
+		arr[a] = b;
+	}
+
+	printf("input polynomial 2 number here\n");	
+	scanf("%d",&n2);
+	printf("input polynomial 2 here\n");
+	for (int i = 0; i < n2; ++i){		
+		scanf("%d %f", &a, &b);
+		printf("index=%d, value=%f, i=%d\n",a,b,i);
+		for (int j = 0; j < 1001; ++j){
+			ans[ j + a ] += arr[j] * b;
+		}
+	}
+
+	printf("count none 0 number\n");
+	for (int i = 2000; i >= 0; i--){
+		if (ans[i] != 0.0){
+			cnt++;
+		}
+	}
+	printf("cnt:%d\n",cnt);
+	printf("here is answers:\n");
+	for (int i = 2000; i >= 0; i--){
+		if (ans[i] != 0.0){
+			printf("%d %.1f\n", i, ans[i]);
+		}
+	}
+	printf("stay here;\n");
+	int zzz;
+	scanf("%d",zzz);
+	return 0;
+}
