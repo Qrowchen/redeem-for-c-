@@ -1,0 +1,111 @@
+// '1010. Radix (25) [⼆分法]
+// Given a pair of positive integers, for example, 6 and 110, can this equation 6 = 110 be true? The answer is
+// “yes”, if 6 is a decimal number and 110 is a binary number.
+// Now for any pair of positive integers N1 and N2, your task is to find the radix of one number while that of
+// the other is given.
+// Input Specification:
+// Each input file contains one test case. Each case occupies a line which contains 4 positive integers:
+// N1 N2 tag radix
+// Here N1 and N2 each has no more than 10 digits. A digit is less than its radix and is chosen from the set
+// {0-9, a-z} where 0-9 represent the decimal numbers 0-9, and a-z represent the decimal numbers 10-35.
+// The last number “radix” is the radix of N1 if “tag” is 1, or of N2 if “tag” is 2.
+// Output Specification:
+// For each test case, print in one line the radix of the other number so that the equation N1 = N2 is true. If
+// the equation is impossible, print “Impossible”. If the solution is not unique, output the smallest possible
+// radix.
+// Sample Input 1:
+// 6 110 1 10
+// Sample Output 1:
+// 2
+// Sample Input 2:
+// 1 ab 1 2
+// Sample Output 2:
+// Impossible
+// 分析：convert函数：给定⼀个数值和⼀个进制，将它转化为10进制。转化过程中可能产⽣溢出
+// find_radix函数：找到令两个数值相等的进制数。在查找的过程中，需要使⽤⼆分查找算法，如果使⽤
+// 当前进制转化得到数值⽐另⼀个⼤或者⼩于0，说明这个进制太⼤～
+
+#include<iostream>
+#include<cctype>
+#include<algorithm>
+#include<cmath>
+using namespace std;
+long long convert(string n, long long radix);
+long long find_radix(string n,long long num);
+
+//给定⼀个数值和⼀个进制，将它转化为10进制。转化过程中可能产⽣溢出
+long long convert(string n, long long radix){
+	long long sum = 0;
+	int index = 0, temp = 0;
+	// 逆向迭代器！！！！！！
+	// 字符读取！！！！
+	// 理想迭代是函数！！！,终止比对也是函数返回！！！
+	for (auto it = n.rbegin(); it != n.rend(); it++){
+		//将char 0-10 转换数字，将char a-z 转换为数
+		temp = isdigit(*it) ? *it -'0':*it-'a' +10;
+		// pow-》radix的index次方，比如10的一次方二次方
+		// 这里用了字符串的逆向迭代器，所以没有迭代，自己准备一个迭代计数
+		sum += temp * pow(radix,index++);
+	}
+	return sum;
+}
+
+//找到令两个数值相等的进制数。在查找的过程中，需要使⽤⼆分查找算法，如果使⽤
+//当前进制转化得到数值⽐另⼀个⼤或者⼩于0，说明这个进制太⼤～
+long long find_radix(string n, long long num) {
+ 	printf("find_radix begin, n=%s, num=%lld \n",n,num);
+ 	// 用数值中最大的猜进制,比如数中最大单个数是14，至少这是进制的最低值15进制
+ 	char it = *max_element(n.begin(), n.end());
+ 	printf("it =%c \n",it);
+ 	long long low = (isdigit(it) ? it - '0': it - 'a' + 10) + 1;
+ 	printf("'low' is :%lld\n",low);
+ 	// 最大值就猜是转换后另一方数据的值
+ 	// 你输入99， 那么可能是100进制最大
+ 	// 你输入1， 那么可以是任何进制，这时候进制看猜测的low
+ 	// 如果转换后的数据（比如n=6 num=111），那么 low=6,num=111,high=111
+ 	// 如果意外（比如一边是n=6<一边num=999），那么low=9，num=6,high=9
+ 	long long high = max(num, low);
+  	printf("'high' is :%lld\n",high);
+
+ 	while (low <= high) {
+ 		// mid 表示猜测的进制
+ 		long long mid = (low + high) / 2;
+ 		printf("mid = %lld\n",mid);
+ 		// t 代表 n 转换为mid后数字
+ 		// 没转换的那个转换mid进制试试
+ 		long long t = convert(n, mid);
+ 		printf("t = %lld\n",t);
+ 		// 转换后数字太大or小于0（溢出），说明进制太大（11111视作2进制和10进制）
+ 		if (t < 0 || t > num) {
+ 			// 上限变为中值-1
+ 			high = mid - 1;
+ 		}
+ 		else if (t == num) {
+ 			// 相等了，返回进制
+ 			return mid;
+ 		}
+ 		else 
+ 			// 转换后数字小于已知方，尝试进制（下限）更新为中值+1
+ 			low = mid + 1;
+ 		//最后low>high,退出循环，返回-1
+  	}
+ 	return -1;
+}
+
+int main(int argc, char const *argv[]){
+	string n1, n2;
+	long long tag = 0, radix = 0, result_radix;
+	cin >> n1 >> n2 >> tag >> radix;
+	printf("n1=%s,n2=%s,tag=%lld,radix=%lld \n",n1,n2,tag,radix);
+	result_radix = tag == 1 ?find_radix(n2,convert(n1,radix)) : find_radix(n1,convert(n2,radix));
+	if (result_radix!=-1)
+	{
+		printf("result_radix:%lld\n",result_radix);
+	}else{
+		printf("Impossible\n");
+	}
+
+	system("pause");
+	return 0;
+}
+
