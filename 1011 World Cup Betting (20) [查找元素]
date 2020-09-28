@@ -1,0 +1,36 @@
+// 题⽬⼤意：给出三场⽐赛以及每场⽐赛的W、T、L的赔率，选取每⼀场⽐赛中赔率最⼤的三个数a b
+// c，先输出三⾏各⾃选择的是W、T、L中的哪⼀个，然后根据计算公式 (a * b * c * 0.65 – 1) * 2 得出最⼤
+// 收益～
+// 分析：以三个数⼀组的形式读取，读取完⼀组后输出最⼤值代表的字⺟，然后同时ans累乘该最⼤值，
+// 最后根据公式输出结果～
+#include<cstdio>
+#include<iostream>
+using namespace std;
+int main(int argc, char const *argv[])
+{
+	char c[4]={"WTL"};
+	double ans = 1.0;
+	for (int i = 0; i < 3; ++i){
+		double maxvalue = 0.0;
+		int maxchar = 0;
+		// 获取每局最大赔率
+		for (int j = 0; j < 3 ; ++j){
+			float temp;
+			scanf("%f",&temp);
+			printf("temp=%f\n",temp);
+			if (maxvalue<=temp)
+			{
+				printf("maxvalue of this line have changed：max=%f：\n",maxvalue);
+				maxvalue = temp;
+				// j指出这一次是选哪个。注意变量的范围
+				maxchar = j;
+			}
+		}
+		ans *= maxvalue;
+		printf("%c\n",c[maxchar]);
+	}
+	printf("%.2f\n",(ans*0.65-1)*2);
+	system("pause");
+
+	return 0;
+}
